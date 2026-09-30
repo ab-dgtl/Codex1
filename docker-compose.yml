@@ -1,0 +1,28 @@
+x-common: &common
+  build: .
+  env_file: .env
+  volumes:
+    - agent-data:/data
+  restart: unless-stopped
+  init: true
+  security_opt:
+    - no-new-privileges:true
+  cap_drop: [ALL]
+services:
+  api:
+    <<: *common
+    ports: ["127.0.0.1:8000:8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+  worker:
+    <<: *common
+    command: ["python", "-m", "prediction_agent.worker"]
+  telegram:
+    <<: *common
+    profiles: [telegram]
+    command: ["python", "-m", "prediction_agent.telegram"]
+volumes:
+  agent-data:

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>Prediction Lab</title>
+<style>body{font:16px system-ui;max-width:960px;margin:40px auto;padding:20px;background:#101827;color:#e5e7eb}input,select,button{padding:10px;margin:6px;max-width:90%}pre{white-space:pre-wrap;background:#1f2937;padding:16px}label{display:block}</style>
+<h1>Prediction Lab</h1><p>Create an experiment and inspect worker results.</p>
+<label>Access token <input id="token" type="password" autocomplete="off"></label>
+<label>Question <input id="question" value="Will the demo event occur?" size="65"></label>
+<select id="provider"><option value="demo">Demo (free)</option><option value="http">Configured HTTP provider (may charge)</option></select>
+<label><input type="checkbox" id="analyze"> AI analysis (may charge)</label>
+<button id="create">Run experiment</button><button id="refresh">Refresh</button>
+<p id="message" role="status"></p><div id="results"></div>
+<script>
+const el=id=>document.getElementById(id);
+async function request(path,options={}){const r=await fetch(path,{...options,headers:{'Authorization':'Bearer '+el('token').value,'Content-Type':'application/json'}});if(!r.ok)throw Error('HTTP '+r.status);return r.json()}
+async function refresh(){try{const runs=await request('/api/runs');el('results').replaceChildren();for(const run of runs){const p=document.createElement('pre');p.textContent=JSON.stringify(run,null,2);el('results').append(p)}el('message').textContent='Updated'}catch(e){el('message').textContent=e.message}}
+el('refresh').onclick=refresh;
+el('create').onclick=async()=>{el('create').disabled=true;try{await request('/api/runs',{method:'POST',body:JSON.stringify({question:el('question').value,provider:el('provider').value,analyze:el('analyze').checked})});await refresh()}catch(e){el('message').textContent=e.message}finally{el('create').disabled=false}};
+</script></html>
