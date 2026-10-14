@@ -156,3 +156,19 @@ def test_api_accepts_finbrain_and_validates_symbol(monkeypatch):
 def test_unknown_provider_rejected(settings):
     with pytest.raises(ValueError, match="Unknown provider"):
         predict({"provider": "typo"}, settings)
+
+
+def test_crypto_symbol_contract(monkeypatch, settings, payload):
+    # Symbol syntax only: availability and quote currency require entitlement confirmation.
+    payload["data"]["symbol"] = "BTC-USD"
+    payload["data"]["name"] = "Synthetic crypto fixture"
+
+    def handler(request):
+        assert request.url.path == "/v2/predictions/daily/BTC-USD"
+        assert not request.url.query
+        return httpx.Response(200, json=payload)
+
+    mock_client(monkeypatch, handler)
+    result = predict(spec(symbol="BTC-USD"), settings)
+    assert result["forecast"]["symbol"] == "BTC-USD"
+

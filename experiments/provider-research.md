@@ -44,6 +44,17 @@ wallet, seed phrase or exchange credentials. Keep it in the VPS .env/secret mana
 not in Git or browser code. APP_TOKEN protects this application's API. Telegram
 and LLM credentials remain optional and independent.
 
+FinBrain requires an account with accurate details, age 18+ and eligibility under
+its access terms. Trial onboarding asks for a work email, company and use case;
+it is not an automatically available retail free tier. The $199/month Terminal
+subscription is not API access. See https://finbrain.tech/terms-conditions and
+https://finbrain.tech/enterprise/. Do not send licensed responses to an external
+LLM or publish them without confirming the applicable license. Danelfin delivers
+its separate API key by email; its Free API plan needs no card. AltIndex requires
+an account and API plan/key; evaluation and internal commercial rights differ.
+Token Metrics current onboarding requirements remain unverified alongside price
+and endpoint quotas, so its 2025 launch price is not a purchase recommendation.
+
 FINBRAIN_ENABLED=false prevents requests even with a configured key. Set true
 only after the owner approves actual API use and its budget. One experiment
 performs one GET, without redirects or automatic retries, including HTTP 429.
@@ -75,3 +86,4 @@ monetary budgets are future work. The adapter and tests implement acquisition
 only. Database keeps runs, but the API lists only the latest 100: seven snapshots
 per day will exceed that display window during a 30-day trial, so use a DB backup
 or add export before the experiment. Do not publish licensed provider responses.
+
