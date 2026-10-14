@@ -1,0 +1,7 @@
+{
+  "question": "Capture the current daily AAPL price forecast for forward evaluation",
+  "provider": "finbrain",
+  "symbol": "AAPL",
+  "forecast_type": "daily",
+  "analyze": false
+}

@@ -12,6 +12,11 @@ class Prediction(BaseModel):
 def predict(spec, settings):
     if spec["provider"] == "demo":
         return {"probability": 0.5, "rationale": "Synthetic baseline; not a real forecast.", "cost_usd": 0}
+    if spec["provider"] == "finbrain":
+        from .finbrain import predict_finbrain
+        return predict_finbrain(spec, settings)
+    if spec["provider"] != "http":
+        raise ValueError("Unknown provider")
     url = urlparse(settings.provider_url)
     allowed = settings.provider_allowed_hosts.split(",")
     if url.scheme != "https" or url.hostname not in allowed or url.username or url.password:
@@ -41,3 +46,4 @@ def analyze(spec, prediction, settings):
                                                                     "prediction": prediction})}]})
         response.raise_for_status()
         return response.json()["choices"][0]["message"]["content"]
+
