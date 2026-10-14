@@ -9,9 +9,12 @@ class Settings(BaseSettings):
     poll_seconds: float = Field(default=2, ge=0.1)
     telegram_bot_token: str = ""
     telegram_allowed_user_ids: str = ""
+    finbrain_api_key: str = ""
+    finbrain_enabled: bool = False
     provider_url: str = ""
     provider_allowed_hosts: str = ""
     provider_api_key: str = ""
     llm_url: str = "https://api.openai.com/v1/chat/completions"
     llm_api_key: str = ""
     llm_model: str = ""
+

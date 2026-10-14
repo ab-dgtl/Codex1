@@ -5,7 +5,7 @@ from typing import Literal
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from .config import Settings
 from .db import enqueue, list_runs
@@ -16,8 +16,16 @@ bearer = HTTPBearer()
 
 class Experiment(BaseModel):
     question: str = Field(min_length=3, max_length=2000)
-    provider: Literal["demo", "http"] = "demo"
+    provider: Literal["demo", "http", "finbrain"] = "demo"
     analyze: bool = False
+    symbol: str | None = Field(default=None, pattern=r"^[A-Z0-9][A-Z0-9.\-]{0,19}$")
+    forecast_type: Literal["daily", "monthly"] = "daily"
+
+    @model_validator(mode="after")
+    def require_symbol(self):
+        if self.provider == "finbrain" and not self.symbol:
+            raise ValueError("FinBrain requires a symbol")
+        return self
 
 
 def auth(credentials: HTTPAuthorizationCredentials = Depends(bearer)):
@@ -45,3 +53,4 @@ def runs(settings=Depends(auth)):
 @app.post("/api/runs", status_code=202)
 def create_run(spec: Experiment, settings=Depends(auth)):
     return {"id": enqueue(settings.database_path, spec.model_dump()), "status": "queued"}
+

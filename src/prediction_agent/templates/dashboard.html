@@ -5,7 +5,9 @@
 <h1>Prediction Lab</h1><p>Create an experiment and inspect worker results.</p>
 <label>Access token <input id="token" type="password" autocomplete="off"></label>
 <label>Question <input id="question" value="Will the demo event occur?" size="65"></label>
-<select id="provider"><option value="demo">Demo (free)</option><option value="http">Configured HTTP provider (may charge)</option></select>
+<select id="provider"><option value="demo">Demo (free)</option><option value="http">Configured HTTP provider (may charge)</option><option value="finbrain">FinBrain (requires approved access)</option></select>
+<label>FinBrain symbol <input id="symbol" value="AAPL" maxlength="20"></label>
+<label>FinBrain horizon <select id="forecast_type"><option value="daily">Daily</option><option value="monthly">Monthly</option></select></label>
 <label><input type="checkbox" id="analyze"> AI analysis (may charge)</label>
 <button id="create">Run experiment</button><button id="refresh">Refresh</button>
 <p id="message" role="status"></p><div id="results"></div>
@@ -14,5 +16,6 @@ const el=id=>document.getElementById(id);
 async function request(path,options={}){const r=await fetch(path,{...options,headers:{'Authorization':'Bearer '+el('token').value,'Content-Type':'application/json'}});if(!r.ok)throw Error('HTTP '+r.status);return r.json()}
 async function refresh(){try{const runs=await request('/api/runs');el('results').replaceChildren();for(const run of runs){const p=document.createElement('pre');p.textContent=JSON.stringify(run,null,2);el('results').append(p)}el('message').textContent='Updated'}catch(e){el('message').textContent=e.message}}
 el('refresh').onclick=refresh;
-el('create').onclick=async()=>{el('create').disabled=true;try{await request('/api/runs',{method:'POST',body:JSON.stringify({question:el('question').value,provider:el('provider').value,analyze:el('analyze').checked})});await refresh()}catch(e){el('message').textContent=e.message}finally{el('create').disabled=false}};
+el('create').onclick=async()=>{el('create').disabled=true;try{await request('/api/runs',{method:'POST',body:JSON.stringify({question:el('question').value,provider:el('provider').value,analyze:el('analyze').checked,...(el('provider').value==='finbrain'?{symbol:el('symbol').value,forecast_type:el('forecast_type').value}:{})})});await refresh()}catch(e){el('message').textContent=e.message}finally{el('create').disabled=false}};
 </script></html>
+
